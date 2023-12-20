@@ -7,10 +7,11 @@ import { getRoomDetail } from "@/lib/roomService";
 import {
     StompSessionProvider
 } from "react-stomp-hooks";
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 
 export default function Home({ params }: { params: { roomId: string } }) {
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -18,12 +19,12 @@ export default function Home({ params }: { params: { roomId: string } }) {
                 const data = await getRoomDetail({ roomId: params.roomId });
                 if (data) {
                     // console.log(data);
-                    redirect("/rooms");
+                    // router.push("/rooms");
                 }
 
             } catch (error) {
                 //redirect to /rooms listing page
-                redirect("/rooms");
+                router.push("/rooms");
             }
         };
         fetchData();
