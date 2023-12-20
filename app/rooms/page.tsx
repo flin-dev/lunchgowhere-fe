@@ -41,10 +41,17 @@ export default function Component() {
         const fetchData = async () => {
             //currently didnt use size as table UI component didnt come by default for changing
             //size of the table
-            const pagingRoomResp: PagingRoom = await getRooms({ page: currentPage, size: 10 });
+            const response: Response = await getRooms({ page: currentPage, size: 10 });
 
-            console.log(pagingRoomResp);
-            setRooms(pagingRoomResp.content);
+            // const decodedResp = await response.json();
+
+            // console.log(decodedResp);
+
+            const pagingRoomResp: PagingRoom = await response.json() as PagingRoom;
+
+            console.log(pagingRoomResp.content)
+
+            setRooms(pagingRoomResp.content);    
             setHasNextPage(pagingRoomResp.last);
             setHasPrevPage(pagingRoomResp.first);
             setTotalPage(pagingRoomResp.totalPages);
@@ -88,9 +95,9 @@ export default function Component() {
                                         <div className="flex items-center gap-2">
                                             <Avatar className="border w-6 h-6">
                                                 <AvatarImage alt="Creator's Avatar" src="/placeholder-user.jpg" />
-                                                <AvatarFallback>CR</AvatarFallback>
+                                                <AvatarFallback>U</AvatarFallback>
                                             </Avatar>
-                                            <span>{room.roomOwner}</span>
+                                            <span>{room.roomOwner.username}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell>

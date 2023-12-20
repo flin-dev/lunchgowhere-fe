@@ -1,53 +1,58 @@
 "use client"
 import { useEffect, useState } from "react"
 import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from "@/components/ui/card"
-import { getRoomDetail } from "@/lib/roomService"
+import { LocationSubmission, Room, getLocationSubmissions } from "@/lib/roomService"
 
-type locationData = { id: string, name: string, description: string, reason: string, image: string };
 
-export const Location = ({ roomId }: { roomId: string }) => {
+export const Location = ({ roomId, roomData }: { roomId: string, roomData: Room }) => {
 
-    const [locations, setLocations] = useState<locationData[]>([]);
+    const [locationSubmissions, setLocationSubmissions] = useState<LocationSubmission[]>([]);
 
-    const mapfor5 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    useEffect(() => {
+        const fetchData = async () => {
+            const resp = await getLocationSubmissions({ roomId });
+
+            const decodedResp = await resp.json();
+
+            console.log(decodedResp);
+            setLocationSubmissions(decodedResp as LocationSubmission[]);
+        }
+
+        fetchData();
+    }, [roomId])
+
     return (<>
         {/* show card with the screen width */}
-        <Card className="w-full h-[400px] p-6 bg-white shadow-lg rounded-lg">
-
+        <Card className="w-full p-6 bg-white shadow-lg rounded-lg">
             <CardHeader>
-                <CardTitle>Lunch gogogo</CardTitle>
-                <CardDescription>By: hhehehehe</CardDescription>
+                <CardTitle>{roomData.name}</CardTitle>
+                <CardDescription>By: {roomData.roomOwner?.username} On: {roomData.targetTime?.toString()} </CardDescription>
             </CardHeader>
             <CardContent className="space-x-4 p-4 border-y">
 
-                {locations.length === 0 ? (
+                {locationSubmissions === null || locationSubmissions?.length === 0 ? (
                     // Centered message if no locations
                     <div className="flex justify-center items-center h-64">No submissions yet.</div>
                 ) : (
-                    <div className="flex overflow-x-auto scrollbar-hide space-x-4 p-4 lg:p-6">
-                        {locations.map((item) => (
-                            <Card key={item.id} className="min-w-[250px]">
+                    <div className="flex w-full overflow-x-auto scrollbar-hide space-x-4 p-4 lg:p-6">
+                        {locationSubmissions && locationSubmissions.map((item: LocationSubmission) => (
+                            <Card key={item.id} className="min-w-52 h-auto p-6 bg-white shadow-lg rounded-lg overflow-hidden">
                                 <CardHeader>
                                     <CardTitle>{item.name}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="grid gap-4 border-y py-4">
+                                    {/* <Image src="/placeholder.svg" /> */}
                                     <img
+                                        src="/placeholder.svg"
                                         alt="Card 4 image"
                                         className="object-cover w-full h-30"
-                                        height="300"
-                                        src="/placeholder.svg"
-                                        style={{
-                                            aspectRatio: "300/300",
-                                            objectFit: "cover",
-                                        }}
-                                        width="300"
                                     />
 
                                 </CardContent>
                                 <CardFooter className="bg-gray-100 py-4 dark:bg-gray-800">
-                                    {item.description}
+                                    Desciption: {item.description}
                                     <br />
-                                    {item.reason}
+                                    Reason: {item.reason}
                                 </CardFooter>
                             </Card>
                         ))}
