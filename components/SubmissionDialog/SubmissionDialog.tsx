@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export const SubmissionDialog = () => {
+export const SubmissionDialog = ({ roomId }: { roomId: string }) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
