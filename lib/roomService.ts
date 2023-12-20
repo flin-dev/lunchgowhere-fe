@@ -14,7 +14,7 @@ export async function getRooms({ page, size }: { page: number, size: number }) {
     return response
 }
 
-export async function createRoom(data: { name: string, roomOwner: string, targetTime: string, description: string }) {
+export async function createRoom(data: { name: string, targetTime: string, description: string }) {
     const response = fetch(`/api/room`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

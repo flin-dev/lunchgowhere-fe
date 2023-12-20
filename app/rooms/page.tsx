@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button"
 import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@/components/ui/table"
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { PagingRoom, Room, createRoom, getRooms } from "@/lib/roomService"
-import { LocalDateTime } from "local-date";
+import { PagingRoom, Room, getRooms } from "@/lib/roomService"
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { CreateRoomDialog } from "@/components/CreateRoomDialog/CreateRoomDialog";
 
 export default function Component() {
     const router = useRouter();
@@ -17,13 +18,6 @@ export default function Component() {
     const [hasPrevPage, setHasPrevPage] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
-
-    const createRoomHandler = async () => {
-        const resp = await createRoom({
-            name: "Chatroom 1", description: "Description for Chatroom 1",
-            roomOwner: "Creator Name", targetTime: new LocalDateTime().toISOString()
-        })
-    };
 
     const turnPageHandler = (action: string) => {
         if (action == "next") {
@@ -37,28 +31,25 @@ export default function Component() {
         router.push(`/room/${roomId}`);
     }
 
+    const fetchData = async () => {
+        //currently didnt use size as table UI component didnt come by default for changing
+        //size of the table
+        const response: Response = await getRooms({ page: currentPage, size: 10 });
+        const pagingRoomResp: PagingRoom = await response.json() as PagingRoom;
+
+        setRooms(pagingRoomResp.content);
+        setHasNextPage(pagingRoomResp.last);
+        setHasPrevPage(pagingRoomResp.first);
+        setTotalPage(pagingRoomResp.totalPages);
+    }
+
     const getRoomsHandler = useEffect(() => {
-        const fetchData = async () => {
-            //currently didnt use size as table UI component didnt come by default for changing
-            //size of the table
-            const response: Response = await getRooms({ page: currentPage, size: 10 });
-
-            // const decodedResp = await response.json();
-
-            // console.log(decodedResp);
-
-            const pagingRoomResp: PagingRoom = await response.json() as PagingRoom;
-
-            console.log(pagingRoomResp.content)
-
-            setRooms(pagingRoomResp.content);    
-            setHasNextPage(pagingRoomResp.last);
-            setHasPrevPage(pagingRoomResp.first);
-            setTotalPage(pagingRoomResp.totalPages);
-        }
-
         fetchData();
     }, [currentPage]);
+
+    const refreshHandler = () => {
+        fetchData();
+    }
 
     return (
         <main className="p-6 space-y-6">
@@ -69,9 +60,7 @@ export default function Component() {
                         <CardTitle>Lunch GoWHERE</CardTitle>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Button size="sm" onClick={createRoomHandler}>
-                            Jio Ppl for lunch
-                        </Button>
+                        <CreateRoomDialog refresh={refreshHandler} />
                     </div>
                 </CardHeader>
 
