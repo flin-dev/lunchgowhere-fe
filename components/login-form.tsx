@@ -1,20 +1,35 @@
 "use client";
 import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-
 import { login } from "@/lib/loginService"
-import React, { useState } from 'react';
+import React, { useState } from 'react'
+import { useRouter } from "next/navigation"
 
 export function LoginForm() {
+  const router = useRouter();
 
   const [username, setUsername] = useState('');
 
-  const handleLogin = () => {
-    login({ username });
-    localStorage.setItem("username", username);
+  const handleLogin = async () => {
+    try {
+      const res = await login({ username });
+      localStorage.setItem("username", username);
+      localStorage.setItem("sId", res);
+
+      //set timeout for 1 hour - 1 second to remove all the localstorage
+      setTimeout(() => {
+        localStorage.removeItem("username");
+        localStorage.removeItem("sId");
+      }, 1000 * 60 * 60 - 1000);
+
+
+      router.push('/rooms');
+
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

@@ -4,5 +4,5 @@ export async function login(data: { username: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-    return await response.json();
+    return response.text();
 }
